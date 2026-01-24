@@ -8,6 +8,7 @@ Purpose:
 """
 
 from __future__ import annotations
+import re
 
 from config import MIN_CHARS, MAX_CHARS
 
@@ -18,11 +19,8 @@ def validate_email(email_text: object) -> tuple[bool, str]:
 
     Returns:
         (is_valid, error_message)
-
-    Notes:
-    - We accept only strings.
-    - We strip whitespace before checking length.
     """
+
     if not isinstance(email_text, str):
         return False, "Input must be a string."
 
@@ -36,5 +34,16 @@ def validate_email(email_text: object) -> tuple[bool, str]:
 
     if len(text) > MAX_CHARS:
         return False, f"Email is too long (max {MAX_CHARS} characters)."
+
+    # --- Anti-gibberish checks (v2) ---
+
+    # Must contain spaces (real language)
+    if text.count(" ") < 3:
+        return False, "Email does not appear to contain real sentences."
+
+    # Must contain alphabetic words
+    words = re.findall(r"[a-zA-Z]{2,}", text)
+    if len(words) < 5:
+        return False, "Email does not contain enough readable words."
 
     return True, ""

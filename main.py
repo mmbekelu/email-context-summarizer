@@ -22,9 +22,8 @@ def run(email_text: str) -> dict:
     is_valid, error_message = validate_email(email_text)
     if not is_valid:
         log_event("validation_failed", error_message)
-        return {
-            "error": error_message
-        }
+        return {"error": error_message}
+
 
     # 2. Clean email text
     cleaned_email, warnings = clean_email(email_text)
@@ -41,4 +40,9 @@ def run(email_text: str) -> dict:
     return summary_output
 
 
-if
+if __name__ == "__main__":
+    sample_email = input("Paste email text:\n")
+    result = run(sample_email)
+
+    print("\n--- RESULT ---")
+    print(result)

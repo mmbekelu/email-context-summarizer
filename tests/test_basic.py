@@ -1,8 +1,14 @@
 # tests/test_basic.py
+import os
+import sys
 import unittest
 
+# Add project root (parent folder) to Python path so imports work when run directly
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, PROJECT_ROOT)
+
 from main import run
-from config import MIN_CHARS, MAX_CHARS
+from config import MAX_CHARS
 
 
 class TestEmailSummarizer(unittest.TestCase):
@@ -36,10 +42,7 @@ class TestEmailSummarizer(unittest.TestCase):
         self.assertIn("warnings", result)
 
     def test_urgency_detection(self):
-        urgent_email = (
-            "This is urgent. Please respond ASAP so we can move forward."
-        )
-
+        urgent_email = "This is urgent. Please respond ASAP so we can move forward."
         result = run(urgent_email)
         self.assertEqual(result["urgency"], "high")
 

@@ -23,9 +23,28 @@ def summarize_email(cleaned_email: str) -> dict:
     sentences = [s.strip() for s in cleaned_email.split(".") if s.strip()]
     output["summary_bullets"] = sentences[:MAX_SUMMARY_BULLETS]
 
-    # Action item heuristic
+    # Action item heuristic (v2)
+    action_starts = (
+        "please",
+        "can you",
+        "could you",
+        "do ",
+        "remember to",
+        "i wanted to ask",
+    )
+
     for sentence in sentences:
-        if sentence.lower().startswith(("please", "can you", "do ", "remember to")):
-            output["action_items"].append(sentence)
+        s = sentence.strip()
+        s_low = s.lower()
+
+        # Starts with action phrases
+        if s_low.startswith(action_starts):
+            output["action_items"].append(s)
+            continue
+
+        # Questions count as action items (only if the original email has a '?')
+        # This works even though we split on "." because the "?" stays in the sentence text.
+        if "?" in cleaned_email and s.endswith("?"):
+            output["action_items"].append(s)
 
     return output
