@@ -4,26 +4,28 @@ Summarization logic.
 v1 uses simple heuristics (no external AI yet).
 """
 
-from config import HIGH_URGENCY_KEYWORDS, MAX_SUMMARY_BULLETS
+import re
+import config
 from schema import empty_output
 
 
 def summarize_email(cleaned_email: str) -> dict:
     output = empty_output()
-
     text_lower = cleaned_email.lower()
 
     # Urgency detection
-    for keyword in HIGH_URGENCY_KEYWORDS:
+    for keyword in config.HIGH_URGENCY_KEYWORDS:
         if keyword in text_lower:
             output["urgency"] = "high"
             break
 
-    # Simple sentence-based summary
-    sentences = [s.strip() for s in cleaned_email.split(".") if s.strip()]
-    output["summary_bullets"] = sentences[:MAX_SUMMARY_BULLETS]
+    # Sentence splitting
+    sentences = [s.strip() for s in re.split(r"[.!?]", cleaned_email) if s.strip()]
 
-    # Action item heuristic (v2)
+    # 🔥 FIX: read value dynamically from config
+    output["summary_bullets"] = sentences[: config.MAX_SUMMARY_BULLETS]
+
+    # Action items
     action_starts = (
         "please",
         "can you",
@@ -34,17 +36,21 @@ def summarize_email(cleaned_email: str) -> dict:
     )
 
     for sentence in sentences:
-        s = sentence.strip()
-        s_low = s.lower()
+        s_low = sentence.lower()
+        if s_low.startswith(action_starts) or "?" in sentence:
+            output["action_items"].append(sentence)
 
-        # Starts with action phrases
-        if s_low.startswith(action_starts):
-            output["action_items"].append(s)
-            continue
+    # Deadline extraction (v1)
+    deadline_patterns = [
+        r"by\s+\w+",              # by Friday
+        r"by\s+\w+\s+\d{1,2}",    # by Jan 30
+        r"\btomorrow\b",
+        r"\beod\b",
+    ]
 
-        # Questions count as action items (only if the original email has a '?')
-        # This works even though we split on "." because the "?" stays in the sentence text.
-        if "?" in cleaned_email and s.endswith("?"):
-            output["action_items"].append(s)
+    for pattern in deadline_patterns:
+        matches = re.findall(pattern, text_lower)
+        output["deadlines"].extend(matches)
 
     return output
+

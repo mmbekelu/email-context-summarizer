@@ -5,8 +5,7 @@ Central configuration for Email Summarizer rules.
 
 MIN_CHARS = 30
 MAX_CHARS = 5000
-
-MAX_SUMMARY_BULLETS = 3
+MAX_SUMMARY_BULLETS = 2
 
 HIGH_URGENCY_KEYWORDS = [
     "asap",
