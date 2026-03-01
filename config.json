@@ -1,4 +1,6 @@
 {
+    "MIN_CHARS": 30,
+    "MAX_CHARS": 5000,
     "HIGH_URGENCY_KEYWORDS": ["urgent", "asap", "emergency", "immediately", "critical"],
     "MAX_SUMMARY_BULLETS": 3,
     "ACTION_ITEM_STARTS": [

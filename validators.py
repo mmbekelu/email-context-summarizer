@@ -1,3 +1,4 @@
+
 # validators.py
 """
 Validation layer for the Email Summarizer.
@@ -9,9 +10,21 @@ Purpose:
 
 from __future__ import annotations
 import re
+import json
+import os
 
-from config import MIN_CHARS, MAX_CHARS
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), "config.json")
+    try:
+        with open(config_path, "r") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {
+            "MIN_CHARS": 30,
+            "MAX_CHARS": 5000
+        }
 
+CONFIG = load_config()
 
 def validate_email(email_text: object) -> tuple[bool, str]:
     """
@@ -29,11 +42,14 @@ def validate_email(email_text: object) -> tuple[bool, str]:
     if not text:
         return False, "Email text is empty."
 
-    if len(text) < MIN_CHARS:
-        return False, f"Email is too short (min {MIN_CHARS} characters)."
+    min_chars = CONFIG.get("MIN_CHARS", 30)
+    max_chars = CONFIG.get("MAX_CHARS", 5000)
 
-    if len(text) > MAX_CHARS:
-        return False, f"Email is too long (max {MAX_CHARS} characters)."
+    if len(text) < min_chars:
+        return False, f"Email is too short (min {min_chars} characters)."
+
+    if len(text) > max_chars:
+        return False, f"Email is too long (max {max_chars} characters)."
 
     # --- Anti-gibberish checks (v2) ---
 
