@@ -1,0 +1,18 @@
+{
+    "HIGH_URGENCY_KEYWORDS": ["urgent", "asap", "emergency", "immediately", "critical"],
+    "MAX_SUMMARY_BULLETS": 3,
+    "ACTION_ITEM_STARTS": [
+        "please",
+        "can you",
+        "could you",
+        "do ",
+        "remember to",
+        "i wanted to ask"
+    ],
+    "DEADLINE_PATTERNS": [
+        "by\\s+\\w+",
+        "by\\s+\\w+\\s+\\d{1,2}",
+        "\\btomorrow\\b",
+        "\\beod\\b"
+    ]
+}
